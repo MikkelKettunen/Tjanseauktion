@@ -7,6 +7,7 @@ import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Separator
 import javafx.scene.control.TextField
 import javafx.scene.layout.Background
 import javafx.scene.layout.HBox
@@ -25,6 +26,8 @@ class Program(private val chores: List<String>,
     private var auctions = ArrayList<Auction>()
     private var randomGenerator = Random()
 
+    var currentAuction: Auction? = null
+
     init {
         teamsInput.forEachIndexed { index, teamName ->
             teams.add(Team(teamName, index))
@@ -32,12 +35,14 @@ class Program(private val chores: List<String>,
         setupSecrets(secrets)
     }
 
-    private fun setupSecrets(num_secret: Int): Int {
+    private fun setupSecrets(input_num_secrets: Int): Int {
+        val num_secret = Math.min(input_num_secrets, chores.size)
+
         for (s in chores) {
             auctions.add(Auction(s))
         }
 
-        for (i in 0..num_secret - 1) {
+        for (i in 0 until num_secret) {
             var index = randomGenerator.nextInt(auctions.size)
             while (auctions[index].isSecret) {
                 index = randomGenerator.nextInt(auctions.size)
@@ -61,6 +66,15 @@ class Program(private val chores: List<String>,
 
         return num_free_chores
     }
+
+    fun buildNextAuction() {
+        val possibleAuctions = auctions.filter { !it.isCompleted }
+
+        currentAuction = if (possibleAuctions.isEmpty())
+            null
+        else
+            possibleAuctions[randomGenerator.nextInt(possibleAuctions.size)]
+    }
 }
 
 
@@ -73,13 +87,11 @@ class Main : Application() {
     init {
         vBox.alignment = Pos.CENTER
         vBox.padding = Insets(10.0)
-        vBox.spacing = 8.0
+        vBox.spacing = 12.0
     }
 
     override fun start(primaryStage: Stage?) {
         if (primaryStage == null) return
-
-        //program.run("/Input/Chores.txt", "/Input/Secrets.txt")
 
         createStartPage()
 
@@ -93,6 +105,11 @@ class Main : Application() {
 
     private fun createTeam(team: Team): HBox {
         val hBox = HBox()
+
+        val teamID = Label()
+        teamID.text = "ID: " + team.num.toString()
+        teamID.minWidth = 100.0
+
         val nameLabel = Label()
         nameLabel.text = team.name
         nameLabel.maxWidth = 200.0
@@ -103,21 +120,81 @@ class Main : Application() {
 
 
         hBox.alignment = Pos.CENTER
-        hBox.children.addAll(nameLabel, moneyLabel)
+        hBox.children.addAll(teamID, nameLabel, moneyLabel)
         return hBox
     }
 
     private fun createAuctionPage() {
         val program = program ?: return // something went very wrong if we did this
 
-        vBox.children.clear()
+        program.buildNextAuction()
 
-        for (team in program.teams) {
-            vBox.children.add(createTeam(team))
+        val currentAuction = program.currentAuction
+        if (currentAuction == null) {
+            // we're done!
+            return
         }
 
+        vBox.children.clear()
+
+        val currentBID = Label()
+        currentBID.text = "current bid: " + currentAuction.getChoreAsString()
+        vBox.children.add(currentBID)
+
+        createVerticalSeparator()
+
+        program.teams.forEachIndexed { index, team ->
+            vBox.children.add(createTeam(team))
+            createVerticalSeparator()
+        }
+
+        val bidInput = HBox()
+        bidInput.alignment = Pos.CENTER
+        bidInput.spacing = 20.0
+
+        val (highInput, highHBox) = createBidBox("High")
+        val (midInput, midHBox) = createBidBox("Mid")
+        val (lowInput, lowHBox) = createBidBox("Low")
+        val (teamInput, teamBox) = createBidBox("team")
+
+        bidInput.children.addAll(highHBox, midHBox, lowHBox, teamBox)
+        vBox.children.add(bidInput)
+
+        val lowerButtons = HBox()
+        lowerButtons.alignment = Pos.CENTER
+        lowerButtons.spacing = 100.0
+
+        val bidButton = Button()
+        bidButton.text = "bid"
+        bidButton.onAction = EventHandler {
+            
+        }
+
+        val soldButton = Button()
+        soldButton.text = "sold"
+        soldButton.onAction = EventHandler {
+
+        }
+
+        lowerButtons.children.addAll(bidButton, soldButton)
+
+        vBox.children.add(lowerButtons)
 
         //vBox.children.addAll()
+    }
+
+    private fun createBidBox(name: String): Pair<TextField, HBox> {
+        val hBox = HBox()
+        hBox.alignment = Pos.CENTER
+
+        val text = Label()
+        text.text = name
+
+        val inputField = TextField()
+
+        hBox.children.addAll(text, inputField)
+
+        return Pair(inputField, hBox)
     }
 
     private fun createStartPage() {
@@ -195,6 +272,10 @@ class Main : Application() {
         vBox.children.addAll(choresHBox, teamsHBox, secretHBox, button, currentDirectory, errorMessage)
     }
 
+
+    private fun createVerticalSeparator() {
+         vBox.children.add(Separator())
+    }
 
     companion object {
         @JvmStatic
