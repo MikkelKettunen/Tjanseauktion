@@ -308,11 +308,13 @@ class Main : Application() {
 
         lowerButtons.children.addAll(cancelBidsButton, bidButton, soldButton)
 
+
         vBox.children.add(lowerButtons)
+
 
         vBox.children.add(errorMessage)
 
-        //vBox.children.addAll()
+        createVerticalSeparator()
     }
 
     private fun createShowWinners() {

@@ -1,3 +1,0 @@
-package Tjanseauktion
-
-class Controller
