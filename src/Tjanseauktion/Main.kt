@@ -9,13 +9,16 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Separator
 import javafx.scene.control.TextField
-import javafx.scene.layout.Background
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import java.io.*
 import java.util.*
+
+val midWorh = 29
+val highWorth = 493
+val startCoins = 5000
 
 class Program(private val chores: List<String>,
               teamsInput: List<String>,
@@ -62,19 +65,26 @@ class Program(private val chores: List<String>,
             a.setSecret()
             auctions.add(a)
         }
+
         Collections.shuffle(auctions)
+
+        val monday = auctions.filter { it.chore.contains("Mandag")}
+        val notMonday = auctions.filter{ !it.chore.contains("Mandag")}
+
+        auctions.clear()
+
+        auctions.addAll(monday)
+        auctions.addAll(notMonday)
 
         return num_free_chores
     }
 
     fun buildNextAuction() {
-        val possibleAuctions = auctions.filter { !it.isCompleted }
-
-        currentAuction = if (possibleAuctions.isEmpty())
-            null
-        else
-            possibleAuctions[randomGenerator.nextInt(possibleAuctions.size)]
+        currentAuction = auctions.firstOrNull { !it.isCompleted }
     }
+
+    fun getTeam(teamID: Int): Team? = teams.firstOrNull { it.num == teamID }
+
 }
 
 
@@ -83,6 +93,7 @@ class Main : Application() {
 
     private val root = StackPane()
     private val vBox = VBox()
+    private val errorMessage = Label()
 
     init {
         vBox.alignment = Pos.CENTER
@@ -106,6 +117,10 @@ class Main : Application() {
     private fun createTeam(team: Team): HBox {
         val hBox = HBox()
 
+        val teamChoresCount = Label()
+        teamChoresCount.text = "Chores: ${team.chores.size}"
+        teamChoresCount.minWidth = 100.0
+
         val teamID = Label()
         teamID.text = "ID: " + team.num.toString()
         teamID.minWidth = 100.0
@@ -120,7 +135,7 @@ class Main : Application() {
 
 
         hBox.alignment = Pos.CENTER
-        hBox.children.addAll(teamID, nameLabel, moneyLabel)
+        hBox.children.addAll(teamChoresCount, teamID, nameLabel, moneyLabel)
         return hBox
     }
 
@@ -157,6 +172,7 @@ class Main : Application() {
         val (lowInput, lowHBox) = createBidBox("Low")
         val (teamInput, teamBox) = createBidBox("team")
 
+
         bidInput.children.addAll(highHBox, midHBox, lowHBox, teamBox)
         vBox.children.add(bidInput)
 
@@ -167,18 +183,79 @@ class Main : Application() {
         val bidButton = Button()
         bidButton.text = "bid"
         bidButton.onAction = EventHandler {
-            
+            val high = highInput.text.toIntOrNull()
+            val mid = midInput.text.toIntOrNull()
+            val low = lowInput.text.toIntOrNull()
+            val teamID = teamInput.text.toIntOrNull()
+            if (high == null || mid == null || low == null || teamID == null) {
+                // print error message
+                errorMessage.text = "Error bid not accepted, could not convert to ints"
+                return@EventHandler
+            }
+
+            val team = program.getTeam(teamID)
+            if (team == null) {
+                errorMessage.text = "Error could not find team with id $teamID"
+                return@EventHandler
+            }
+
+
+            val auction = program.currentAuction
+            if (auction == null) {
+                errorMessage.text = "No auction"
+                return@EventHandler
+            }
+
+            val bidCoins = high * highWorth + mid * midWorh + low
+            print("$bidCoins, bid coins")
+
+            if (!team.canAfford(bidCoins)) {
+                errorMessage.text = "Team ${team.name}, could not afford $bidCoins"
+                return@EventHandler
+            }
+
+            if (auction.bid(bidCoins, teamID)) {
+                errorMessage.text = "Team ${team.name} bid ${bidCoins} coins"
+            } else {
+                errorMessage.text = "Team ${team.name} didn't have enough coins!"
+            }
         }
 
         val soldButton = Button()
         soldButton.text = "sold"
         soldButton.onAction = EventHandler {
+            val auction = program.currentAuction
+            if (auction == null) {
+                errorMessage.text = "no action found when selling"
+                return@EventHandler
+            }
 
+            if (!auction.hasBid()) {
+                errorMessage.text = "auction had no bids"
+                return@EventHandler
+            }
+
+            val team = program.getTeam(auction.bidder)
+
+            if (team == null) {
+                errorMessage.text = "Could not find bidder team!"
+                return@EventHandler
+            }
+
+            team.buyChore(auction.chore, auction.bid)
+
+            auction.complete()
+
+            createAuctionPage()
+
+            errorMessage.text = "${team.name} won bid"
         }
 
         lowerButtons.children.addAll(bidButton, soldButton)
 
         vBox.children.add(lowerButtons)
+
+        vBox.children.add(errorMessage)
 
         //vBox.children.addAll()
     }
@@ -221,6 +298,8 @@ class Main : Application() {
         val (secretInput, secretHBox) = createInputBox("Secrets")
         val (choresInput, choresHBox) = createInputBox("Chores file")
         val (teamsInput, teamsHBox) = createInputBox("Teams file")
+        choresInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"
+        teamsInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams"
 
         val button = Button()
 
@@ -274,7 +353,7 @@ class Main : Application() {
 
 
     private fun createVerticalSeparator() {
-         vBox.children.add(Separator())
+        vBox.children.add(Separator())
     }
 
     companion object {

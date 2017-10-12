@@ -13,9 +13,9 @@ class Team(val name: String, val num: Int) {
     //ToDo: A mid valuta is worth 29 this year. should be changed!
     val coinString: String
         get() {
-            val high = Math.floor((coins / 493).toDouble()).toInt()
-            val mid = Math.floor((coins % 493 / 29).toDouble()).toInt()
-            val low = coins % 493 % 29
+            val high = Math.floor((coins / highWorth).toDouble()).toInt()
+            val mid = Math.floor((coins % highWorth / midWorh).toDouble()).toInt()
+            val low = coins % highWorth % midWorh
 
             return high.toString() + "." + mid + "." + low
         }
@@ -25,7 +25,7 @@ class Team(val name: String, val num: Int) {
 
     init {
         //ToDo: Remember to update!
-        coins = 493 + 72 * 29 + 392
+        coins = startCoins
     }
 
     fun buyChore(chore: String, coins: Int) {

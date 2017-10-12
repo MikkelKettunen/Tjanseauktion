@@ -4,9 +4,9 @@ package Tjanseauktion
  * Created by chrae on 28-08-2017.
  */
 class Auction(val chore: String) {
-    var bid = 0
+    var bid = -1
         private set
-    var bidder = 0
+    var bidder = -1
         private set
     var isSecret = false
         private set
