@@ -28,6 +28,8 @@ class Auction(val chore: String) {
     fun bid(bid: Int, bidder: Int): Boolean {
         if (bid <= this.bid)
             return false
+        if (bidder == this.bidder)
+            return false
         this.bid = bid
         this.bidder = bidder
         hasBid = true
@@ -51,5 +53,11 @@ class Auction(val chore: String) {
         else
             chore + " NOBID"
         return s
+    }
+
+    fun cancelBid() {
+        bid = -1
+        bidder = -1
+        hasBid = false
     }
 }

@@ -3,6 +3,7 @@ package Tjanseauktion
 import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
@@ -12,26 +13,36 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Font
 import javafx.stage.Stage
 import java.io.*
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.protobuf.ByteString
 
 val midWorh = 29
 val highWorth = 493
 val startCoins = 5000
 
-class Program(private val chores: List<String>,
-              teamsInput: List<String>,
-              secrets: Int) {
+class Program() {
 
-    private var num_chores: Int = 0
+    private val logWriter = LogWriter()
+
+    var num_chores_per_team: Int = 0
+        private set
+    private var chores: List<String> = mutableListOf()
     var teams = ArrayList<Team>()
+        private set
     private var auctions = ArrayList<Auction>()
     private var randomGenerator = Random()
 
     var currentAuction: Auction? = null
 
-    init {
+    fun start(inChores: List<String>,
+              teamsInput: List<String>,
+              secrets: Int) {
+
+        chores = inChores
+
         teamsInput.forEachIndexed { index, teamName ->
             teams.add(Team(teamName, index))
         }
@@ -55,9 +66,9 @@ class Program(private val chores: List<String>,
         }
 
         // Calculate number of chores per team
-        num_chores = Math.ceil(chores.size.toDouble() / teams.size).toInt()
+        num_chores_per_team = Math.ceil(chores.size.toDouble() / teams.size).toInt()
         // Calculate number of free chores
-        val num_free_chores = num_chores * teams.size % chores.size
+        val num_free_chores = num_chores_per_team * teams.size % chores.size
 
         //Insert free chores
         (0 until num_free_chores).forEach { i ->
@@ -68,8 +79,8 @@ class Program(private val chores: List<String>,
 
         Collections.shuffle(auctions)
 
-        val monday = auctions.filter { it.chore.contains("Mandag")}
-        val notMonday = auctions.filter{ !it.chore.contains("Mandag")}
+        val monday = auctions.filter { it.chore.contains("Mandag") }
+        val notMonday = auctions.filter { !it.chore.contains("Mandag") }
 
         auctions.clear()
 
@@ -84,12 +95,26 @@ class Program(private val chores: List<String>,
     }
 
     fun getTeam(teamID: Int): Team? = teams.firstOrNull { it.num == teamID }
+    fun save() {
+        logWriter.writeStatus(auctions, teams)
+    }
+
+    fun load(): Boolean {
+        val logReader = LogReader("log.txt")
+        if (logReader.successfully) {
+            auctions = logReader.auctions
+            teams = logReader.teams
+        }
+
+        return logReader.successfully
+    }
 
 }
 
 
 class Main : Application() {
     private var program: Program? = null
+
 
     private val root = StackPane()
     private val vBox = VBox()
@@ -130,8 +155,10 @@ class Main : Application() {
         nameLabel.maxWidth = 200.0
         nameLabel.minWidth = 200.0
 
+
+
         val moneyLabel = Label()
-        moneyLabel.text = team.coins.toString()
+        moneyLabel.text = "${team.coinString} | ${team.coins}"
 
 
         hBox.alignment = Pos.CENTER
@@ -147,14 +174,23 @@ class Main : Application() {
         val currentAuction = program.currentAuction
         if (currentAuction == null) {
             // we're done!
+            createShowWinners()
             return
         }
 
         vBox.children.clear()
 
+
         val currentBID = Label()
         currentBID.text = "current bid: " + currentAuction.getChoreAsString()
+        currentBID.font = Font("arial", 20.0)
         vBox.children.add(currentBID)
+
+        val currentBIDCoins = Label()
+        val bidder = program.getTeam(currentAuction.bidder)?.name ?: "No bidder"
+        currentBIDCoins.text = "'$bidder' bids '${currentAuction.bid}' coins"
+        currentBIDCoins.font = Font("arial", 20.0)
+        vBox.children.add(currentBIDCoins)
 
         createVerticalSeparator()
 
@@ -207,18 +243,24 @@ class Main : Application() {
             }
 
             val bidCoins = high * highWorth + mid * midWorh + low
-            print("$bidCoins, bid coins")
 
             if (!team.canAfford(bidCoins)) {
                 errorMessage.text = "Team ${team.name}, could not afford $bidCoins"
                 return@EventHandler
             }
 
+            if (team.chores.size >= program.num_chores_per_team)  {
+                errorMessage.text = "Team ${team.name} already have ${program.num_chores_per_team} chores"
+            }
+
             if (auction.bid(bidCoins, teamID)) {
-                errorMessage.text = "Team ${team.name} bid ${bidCoins} coins"
+                errorMessage.text = "Team ${team.name} bid $bidCoins coins"
+                createAuctionPage()
             } else {
                 errorMessage.text = "Team ${team.name} didn't have enough coins!"
             }
+
+            program.save()
         }
 
         val soldButton = Button()
@@ -251,13 +293,70 @@ class Main : Application() {
             errorMessage.text = "${team.name} won bid"
         }
 
-        lowerButtons.children.addAll(bidButton, soldButton)
+        val cancelBidsButton = Button()
+        cancelBidsButton.text = "Cancel bids"
+        cancelBidsButton.onAction = EventHandler {
+             val auction = program.currentAuction
+            if (auction == null) {
+                errorMessage.text = "no action found when selling"
+                return@EventHandler
+            }
+            auction.cancelBid()
+            createAuctionPage()
+        }
+
+
+        lowerButtons.children.addAll(cancelBidsButton, bidButton, soldButton)
 
         vBox.children.add(lowerButtons)
 
         vBox.children.add(errorMessage)
 
         //vBox.children.addAll()
+    }
+
+    private fun createShowWinners() {
+        vBox.children.clear()
+
+        val program = program
+        if (program == null) {
+            println("should not happen!!")
+            return
+        }
+
+        val writer = OutputWriter("Auctions.pdf", program.teams)
+        writer.writeOutput()
+
+
+        for (team in program.teams) {
+            val vTeamBox = VBox()
+
+            val teamName = Label()
+            teamName.text = team.name
+            teamName.minWidth = 100.0
+
+
+            val hBox = HBox()
+            for (chore in team.chores) {
+                val label = Label()
+                label.text = chore
+                label.minWidth = 50.0
+
+                hBox.children.add(label)
+                hBox.padding = Insets(5.0)
+
+                val separator = Separator()
+                separator.orientation = Orientation.VERTICAL
+                separator.minWidth = 10.0
+                hBox.children.add(separator)
+            }
+
+            vTeamBox.children.addAll(teamName, hBox)
+            createVerticalSeparator()
+
+            vBox.children.addAll(vTeamBox, hBox)
+        }
+
     }
 
     private fun createBidBox(name: String): Pair<TextField, HBox> {
@@ -295,11 +394,21 @@ class Main : Application() {
             Pair(textInput, textInputHBox)
         }
 
+        val loadButton = Button()
+        loadButton.text = "Load"
+        loadButton.onAction = EventHandler {
+            val tmpProgram = Program()
+            if (tmpProgram.load()) {
+                program = tmpProgram
+                createAuctionPage()
+            }
+        }
+
         val (secretInput, secretHBox) = createInputBox("Secrets")
         val (choresInput, choresHBox) = createInputBox("Chores file")
         val (teamsInput, teamsHBox) = createInputBox("Teams file")
-        choresInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"
-        teamsInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams"
+        choresInput.text = "C:\\Users\\mkk\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"//"C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"
+        teamsInput.text = "C:\\Users\\mkk\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams" //"C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams"
 
         val button = Button()
 
@@ -337,7 +446,8 @@ class Main : Application() {
 
             val teamsAsList = file.readLines()
 
-            program = Program(choresAsList, teamsAsList, secret)
+            program = Program()
+            program?.start(choresAsList, teamsAsList, secret)
 
             createAuctionPage()
 
@@ -348,7 +458,7 @@ class Main : Application() {
 
 
         vBox.children.clear()
-        vBox.children.addAll(choresHBox, teamsHBox, secretHBox, button, currentDirectory, errorMessage)
+        vBox.children.addAll(loadButton, choresHBox, teamsHBox, secretHBox, button, currentDirectory, errorMessage)
     }
 
 

@@ -11,8 +11,10 @@ import java.util.ArrayList
 class LogReader(filename: String) {
     val teams = ArrayList<Team>()
     val auctions = ArrayList<Auction>()
+    val successfully: Boolean
 
     init {
+        var wasSuccessFull = true
         try {
             val reader = BufferedReader(FileReader(filename))
             var line: String?
@@ -22,6 +24,7 @@ class LogReader(filename: String) {
             while (line != null) {
                 if (line == "auctions") {
                     isAuction = true
+                    line = reader.readLine()
                     continue
                 }
 
@@ -44,10 +47,9 @@ class LogReader(filename: String) {
                         auction.bid(Integer.parseInt(strs[1]), Integer.parseInt(strs[2]))
                         auction.complete()
 
-                        for (t in teams) {
-                            if (t.num == Integer.parseInt(strs[2]))
-                                t.addChore(strs[0])
-                        }
+                        teams
+                                .filter { it.num == Integer.parseInt(strs[2]) }
+                                .forEach { it.addChore(strs[0]) }
                     }
 
                     auctions.add(auction)
@@ -55,10 +57,14 @@ class LogReader(filename: String) {
                 line = reader.readLine()
             }
         } catch (e: IOException) {
+            wasSuccessFull = false
             println("Error reading the log file.")
         } catch (e: IndexOutOfBoundsException) {
+            wasSuccessFull = false
             println("File is incorrect format.")
         }
+
+        successfully = wasSuccessFull
 
     }
 }
