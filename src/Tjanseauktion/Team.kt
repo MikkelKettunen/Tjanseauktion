@@ -14,8 +14,8 @@ class Team(val name: String, val num: Int) {
     val coinString: String
         get() {
             val high = Math.floor((coins / highWorth).toDouble()).toInt()
-            val mid = Math.floor((coins % highWorth / midWorh).toDouble()).toInt()
-            val low = coins % highWorth % midWorh
+            val mid = Math.floor((coins % highWorth / midWorth).toDouble()).toInt()
+            val low = coins % highWorth % midWorth
 
             return high.toString() + "." + mid + "." + low
         }

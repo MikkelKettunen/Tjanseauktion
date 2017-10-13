@@ -18,14 +18,16 @@ import javafx.scene.text.Font
 import javafx.stage.Stage
 import java.io.*
 import java.util.*
-import kotlin.reflect.jvm.internal.impl.protobuf.ByteString
 
-val midWorh = 29
+val midWorth = 29
 val highWorth = 493
 val startCoins = 5000
 
-class Program() {
+val highCoinName = "High"
+val midCoinName = "Mid"
+val lowCoinName = "Low"
 
+class Program {
     private val logWriter = LogWriter()
 
     var num_chores_per_team: Int = 0
@@ -203,9 +205,9 @@ class Main : Application() {
         bidInput.alignment = Pos.CENTER
         bidInput.spacing = 20.0
 
-        val (highInput, highHBox) = createBidBox("High")
-        val (midInput, midHBox) = createBidBox("Mid")
-        val (lowInput, lowHBox) = createBidBox("Low")
+        val (highInput, highHBox) = createBidBox(highCoinName)
+        val (midInput, midHBox) = createBidBox(midCoinName)
+        val (lowInput, lowHBox) = createBidBox(lowCoinName)
         val (teamInput, teamBox) = createBidBox("team")
 
 
@@ -242,7 +244,7 @@ class Main : Application() {
                 return@EventHandler
             }
 
-            val bidCoins = high * highWorth + mid * midWorh + low
+            val bidCoins = high * highWorth + mid * midWorth + low
 
             if (!team.canAfford(bidCoins)) {
                 errorMessage.text = "Team ${team.name}, could not afford $bidCoins"
@@ -257,7 +259,7 @@ class Main : Application() {
                 errorMessage.text = "Team ${team.name} bid $bidCoins coins"
                 createAuctionPage()
             } else {
-                errorMessage.text = "Team ${team.name} didn't have enough coins!"
+                errorMessage.text = "Team ${team.name} didn't bid enough coins!"
             }
 
             program.save()
@@ -328,9 +330,9 @@ class Main : Application() {
         bidInput.alignment = Pos.CENTER
         bidInput.spacing = 20.0
 
-        val (highInput, highHBox) = createBidBox("High")
-        val (midInput, midHBox) = createBidBox("Mid")
-        val (lowInput, lowHBox) = createBidBox("Low")
+        val (highInput, highHBox) = createBidBox(highCoinName)
+        val (midInput, midHBox) = createBidBox(midCoinName)
+        val (lowInput, lowHBox) = createBidBox(lowCoinName)
         val output = Label()
         output.text = "output: "
 
@@ -356,7 +358,7 @@ class Main : Application() {
                 return@EventHandler
             }
 
-            val coins = highWorth * high + mid * midWorh + low
+            val coins = highWorth * high + mid * midWorth + low
             output.text =
                     "output: $coins"
         }
@@ -530,7 +532,7 @@ class Main : Application() {
 
 
 private fun String.toIntOrNull(): Int? {
-    var result: Int? = null
+    var result: Int?
     try {
         result = toInt()
         if (result < 0)
