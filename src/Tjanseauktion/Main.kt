@@ -5,6 +5,7 @@ import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -156,7 +157,6 @@ class Main : Application() {
         nameLabel.minWidth = 200.0
 
 
-
         val moneyLabel = Label()
         moneyLabel.text = "${team.coinString} | ${team.coins}"
 
@@ -249,7 +249,7 @@ class Main : Application() {
                 return@EventHandler
             }
 
-            if (team.chores.size >= program.num_chores_per_team)  {
+            if (team.chores.size >= program.num_chores_per_team) {
                 errorMessage.text = "Team ${team.name} already have ${program.num_chores_per_team} chores"
             }
 
@@ -296,7 +296,7 @@ class Main : Application() {
         val cancelBidsButton = Button()
         cancelBidsButton.text = "Cancel bids"
         cancelBidsButton.onAction = EventHandler {
-             val auction = program.currentAuction
+            val auction = program.currentAuction
             if (auction == null) {
                 errorMessage.text = "no action found when selling"
                 return@EventHandler
@@ -314,7 +314,58 @@ class Main : Application() {
 
         vBox.children.add(errorMessage)
 
+        val calculator = createCalculator()
+        vBox.children.add(calculator)
+
         createVerticalSeparator()
+    }
+
+    private fun createCalculator(): Node {
+        val vBox = VBox()
+        val hBox = HBox()
+
+        val bidInput = HBox()
+        bidInput.alignment = Pos.CENTER
+        bidInput.spacing = 20.0
+
+        val (highInput, highHBox) = createBidBox("High")
+        val (midInput, midHBox) = createBidBox("Mid")
+        val (lowInput, lowHBox) = createBidBox("Low")
+        val output = Label()
+        output.text = "output: "
+
+        hBox.children.addAll(highHBox, midHBox, lowHBox, output)
+
+        val calculateButton = Button()
+        calculateButton.text = "Calculate"
+        calculateButton.onAction = EventHandler {
+            val high = highInput.text.toIntOrNull()
+            val mid = midInput.text.toIntOrNull()
+            val low = lowInput.text.toIntOrNull()
+            if (high == null) {
+                errorMessage.text = "high not a number!"
+                return@EventHandler
+            }
+            if (mid == null) {
+                errorMessage.text = "mid not a number!"
+                return@EventHandler
+            }
+
+            if (low == null) {
+                errorMessage.text = "low not a number!"
+                return@EventHandler
+            }
+
+            val coins = highWorth * high + mid * midWorh + low
+            output.text =
+                    "output: $coins"
+        }
+
+        vBox.children.addAll(hBox, calculateButton)
+
+        hBox.alignment = Pos.CENTER
+
+        return vBox
     }
 
     private fun createShowWinners() {
@@ -409,8 +460,8 @@ class Main : Application() {
         val (secretInput, secretHBox) = createInputBox("Secrets")
         val (choresInput, choresHBox) = createInputBox("Chores file")
         val (teamsInput, teamsHBox) = createInputBox("Teams file")
-        choresInput.text = "C:\\Users\\mkk\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"//"C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"
-        teamsInput.text = "C:\\Users\\mkk\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams" //"C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams"
+        choresInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Chores"
+        teamsInput.text = "C:\\Users\\mikkel\\Documents\\GitHub\\Tjanseauktion\\Input\\Teams"
 
         val button = Button()
 
@@ -479,10 +530,14 @@ class Main : Application() {
 
 
 private fun String.toIntOrNull(): Int? {
-    return try {
-        toInt()
+    var result: Int? = null
+    try {
+        result = toInt()
+        if (result < 0)
+            result = null
     } catch (e: Exception) {
-        null
+        result = null
     }
+    return result
 }
 

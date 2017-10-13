@@ -1,5 +1,5 @@
-0;team0;2969
-1;team1;2908
+0;team0;5000
+1;team1;5000
 2;team2;5000
 3;team3;5000
 4;team4;5000
@@ -8,54 +8,54 @@
 7;team7;5000
 8;team8;5000
 9;team9;5000
-10;team10;0
-11;team11;0
+10;team10;5000
+11;team11;5000
 auctions
-Oprydning efter fest - Mandag;2031;0;false;true;true
-Rengøring af spisesal - Mandag;0;1;false;true;true
-Oprydning udendørs - Mandag;0;0;false;true;true
-Fejning og vask af gulv i sove-hytterne - Mandag;0;0;false;true;true
-Afrydning/opvask efter morgenmad - Mandag;0;0;false;true;true
-Klargøre morgenmad   - Mandag;2092;1;false;true;true
-Fri tjans - Mandag;0;1;false;true;true
-Rengøring af pejsestuen - Mandag;0;1;false;true;true
-Oprydning efter fest - Mandag;0;2;false;true;true
-Rengøring af køkken - Mandag;0;2;false;true;true
-Prep restauktion + madpakker - Mandag;0;2;false;true;true
-Rengøring af badeværelser i sove-hytterne - Mandag;0;2;false;true;true
-Galemiddag tidlig - Søndag;0;3;false;true;true
-Udendørsvagt - Søndag;0;3;false;true;true
-Klargøre morgenmad - Søndag;0;3;false;true;true
-Mad prep - Fredag;0;3;false;true;true
-Oprydning efter fest - Lørdag;0;4;false;true;true
-Galemiddag tidlig - Søndag;0;4;false;true;true
-Oprydning efter fest - Lørdag;0;4;false;true;true
-Udendørsvagt - Lørdag;0;4;false;true;true
-Opstil stole til oplæg - Lørdag;0;5;false;true;true
-Afrydning/opvask efter hovedretten - Søndag;0;5;false;true;true
-Afrydning/opvask efter frokost - Søndag;0;5;false;true;true
-Klargøre frokost - Lørdag;0;5;false;true;true
-Udendørsvagt - Fredag;0;6;false;true;true
-Klargøre aftensmad - Lørdag;0;6;true;true;true
-Afrydning/opvask efter aftensmad - Lørdag;0;6;true;true;true
-Galemiddag Dessert - Søndag;0;6;false;true;true
-Klargøring til Fludo - Lørdag;0;7;false;true;true
-Klargøre frokost - Lørdag;0;7;false;true;true
-Oprydning efter BC - Fredag;0;7;false;true;true
-Afrydning/opvask efter morgenmad - Søndag;0;7;false;true;true
-Klargøre frokost - Søndag;0;8;false;true;true
-Prep til aftensmad - Søndag;0;8;false;true;true
-Afrydning/opvask efter morgenmad - Lørdag;0;8;true;true;true
-Klargøre til kaffe og rydde op - Lørdag;0;8;true;true;true
-Oprydning efter fest - Søndag;0;9;true;true;true
-Oprydning efter fest - Søndag;0;9;false;true;true
-Oprydning efter FLUDO - Lørdag;0;9;false;true;true
-Klargøre morgenmad - Lørdag;0;9;false;true;true
-Opstil stole til oplæg - Søndag;0;10;false;true;true
-Afrydning/opvask efter frokost - Lørdag;0;10;false;true;true
-Afrydning/opvask efter aftensmad - Fredag;5000;10;false;true;true
-Kagetjans - Søndag;0;10;false;true;true
-Kagetjans - Søndag;0;11;false;true;true
-Afrydning/opvask efter forretten - Søndag;0;11;false;true;true
-Afrydning/opvask efter desserten - Søndag;5000;11;false;true;true
-Pynte op til galemiddag - Søndag;0;11;false;true;false
+Fejning og vask af gulv i sove-hytterne - Mandag;1972;0;false;true;false
+Rengøring af badeværelser i sove-hytterne - Mandag;-1;-1;false;false;false
+Fri tjans - Mandag;-1;-1;false;false;false
+Oprydning efter fest - Mandag;-1;-1;false;false;false
+Oprydning udendørs - Mandag;-1;-1;false;false;false
+Rengøring af spisesal - Mandag;-1;-1;false;false;false
+Afrydning/opvask efter morgenmad - Mandag;-1;-1;false;false;false
+Oprydning efter fest - Mandag;-1;-1;false;false;false
+Rengøring af køkken - Mandag;-1;-1;false;false;false
+Klargøre morgenmad   - Mandag;-1;-1;false;false;false
+Prep restauktion + madpakker - Mandag;-1;-1;false;false;false
+Rengøring af pejsestuen - Mandag;-1;-1;false;false;false
+Afrydning/opvask efter desserten - Søndag;-1;-1;false;false;false
+Prep til aftensmad - Søndag;-1;-1;false;false;false
+Oprydning efter fest - Søndag;-1;-1;false;false;false
+Klargøre morgenmad - Lørdag;-1;-1;false;false;false
+Galemiddag Dessert - Søndag;-1;-1;false;false;false
+Klargøre frokost - Lørdag;-1;-1;false;false;false
+Opstil stole til oplæg - Lørdag;-1;-1;false;false;false
+Afrydning/opvask efter frokost - Lørdag;-1;-1;false;false;false
+Oprydning efter FLUDO - Lørdag;-1;-1;false;false;false
+Afrydning/opvask efter forretten - Søndag;-1;-1;false;false;false
+Klargøre aftensmad - Lørdag;-1;-1;false;false;false
+Oprydning efter fest - Søndag;-1;-1;false;false;false
+Klargøre morgenmad - Søndag;-1;-1;false;false;false
+Opstil stole til oplæg - Søndag;-1;-1;false;false;false
+Mad prep - Fredag;-1;-1;false;false;false
+Oprydning efter BC - Fredag;-1;-1;false;false;false
+Udendørsvagt - Fredag;-1;-1;false;false;false
+Afrydning/opvask efter aftensmad - Fredag;-1;-1;false;false;false
+Oprydning efter fest - Lørdag;-1;-1;false;false;false
+Oprydning efter fest - Lørdag;-1;-1;false;false;false
+Afrydning/opvask efter morgenmad - Lørdag;-1;-1;false;false;false
+Pynte op til galemiddag - Søndag;-1;-1;false;false;false
+Kagetjans - Søndag;-1;-1;false;false;false
+Udendørsvagt - Søndag;-1;-1;false;false;false
+Udendørsvagt - Lørdag;-1;-1;false;false;false
+Galemiddag tidlig - Søndag;-1;-1;false;false;false
+Afrydning/opvask efter aftensmad - Lørdag;-1;-1;false;false;false
+Galemiddag tidlig - Søndag;-1;-1;false;false;false
+Afrydning/opvask efter frokost - Søndag;-1;-1;false;false;false
+Klargøre frokost - Søndag;-1;-1;false;false;false
+Klargøring til Fludo - Lørdag;-1;-1;false;false;false
+Kagetjans - Søndag;-1;-1;false;false;false
+Klargøre til kaffe og rydde op - Lørdag;-1;-1;false;false;false
+Afrydning/opvask efter morgenmad - Søndag;-1;-1;false;false;false
+Afrydning/opvask efter hovedretten - Søndag;-1;-1;false;false;false
+Klargøre frokost - Lørdag;-1;-1;false;false;false
